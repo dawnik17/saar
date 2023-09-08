@@ -95,3 +95,35 @@ def clean_model_generated_text(text):
             
     cleaned_text = ' '.join(unique_sentences)
     return cleaned_text
+
+
+def print_number_of_trainable_model_parameters(model):
+    """
+    Calculate and print the number of trainable parameters in a PyTorch model.
+
+    Parameters:
+    model (torch.nn.Module): The PyTorch model for which you want to count trainable parameters.
+
+    Returns:
+    str: A string containing information about the trainable and total parameters, 
+         as well as the percentage of trainable parameters.
+
+    Example:
+    >>> model = YourPyTorchModel()
+    >>> result = print_number_of_trainable_model_parameters(model)
+    >>> print(result)
+    trainable model parameters: 123456
+    all model parameters: 789012
+    percentage of trainable model parameters: 15.65%
+    """
+        
+    trainable_model_params = 0
+    all_model_params = 0
+    
+    for _, param in model.named_parameters():
+        all_model_params += param.numel()
+        
+        if param.requires_grad:
+            trainable_model_params += param.numel()
+    
+    return f"trainable model parameters: {trainable_model_params}\nall model parameters: {all_model_params}\npercentage of trainable model parameters: {100 * trainable_model_params / all_model_params:.2f}%"
