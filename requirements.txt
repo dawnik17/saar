@@ -1,0 +1,5 @@
+tqdm==4.66.1
+GoogleNews==1.6.10
+newspaper3k==0.2.8
+transformers==4.28.1
+peft==0.3.0
