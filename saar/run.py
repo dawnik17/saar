@@ -1,6 +1,6 @@
 import os
 import pickle
-from tqdm import tqdm 
+from tqdm import tqdm
 from saar.data.production import get_google_news
 from saar.infer import Infer
 from saar.utils import deduplicate_list_of_dicts, get_full_news
@@ -18,7 +18,11 @@ just to take out the delta
 and process the new urls only
 """
 title_store_path = ""
-title_store = pickle.load(open(title_store_path, "rb")) if os.path.isfile(title_store_path) else set()
+title_store = (
+    pickle.load(open(title_store_path, "rb"))
+    if os.path.isfile(title_store_path)
+    else set()
+)
 
 # remove news that is already inserted
 news = [new for new in news if new["link"] not in title_store]
