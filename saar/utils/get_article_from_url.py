@@ -35,32 +35,37 @@ from datetime import datetime
 from typing import Dict
 
 
-nltk.download('punkt')
+nltk.download("punkt")
 pattern = re.compile(r'[^a-zA-Z0-9`~!@#$%^&*()_+={}\[\]:;"\'<>,.?/\\| -]')
-phrases_to_remove = ["Sign In", "Want to read more?", "Already have an account?", "To continue reading"]
+phrases_to_remove = [
+    "Sign In",
+    "Want to read more?",
+    "Already have an account?",
+    "To continue reading",
+]
 
 
 def remove_phrases(string, phrases):
-    pattern = '|'.join(re.escape(phrase) for phrase in phrases)
+    pattern = "|".join(re.escape(phrase) for phrase in phrases)
     result = re.split(pattern, string)
     return result[0]
 
 
 def curate_article(article):
-    # Remove characters not on the QWERTY keyboard 
-    article = pattern.sub('', article)
-    
+    # Remove characters not on the QWERTY keyboard
+    article = pattern.sub("", article)
+
     # Remove "Advertisement" sections
-    curated_article = re.sub(r'Advertisement', '', article)
+    curated_article = re.sub(r"Advertisement", "", article)
 
     # Remove extra spaces and new lines
-    curated_article = re.sub(r'\n{3,}', '\n\n', curated_article)
-    
+    curated_article = re.sub(r"\n{3,}", "\n\n", curated_article)
+
     # Remove everything after the stop phrases
     curated_article = remove_phrases(curated_article, phrases_to_remove)
-    
+
     # routine curation
-    curated_article = re.sub(r'\s+', ' ', curated_article)
+    curated_article = re.sub(r"\s+", " ", curated_article)
     curated_article = curated_article.strip()
 
     return curated_article
@@ -68,48 +73,46 @@ def curate_article(article):
 
 def get_full_news(news: Dict):
     url = news["link"]
-    
+
     try:
         article = Article(url)
         article.download()
         article.parse()
         article.nlp()
-    
+
     except:
-        return 
-    
+        return
+
     full_text = curate_article(article.text)
 
     # failure criteria
     if article.is_media_news() or len(full_text.split()) < 50:
         return
-    
+
     news["full_text"] = full_text
-    
+
     if "image_url" not in news:
         news["image_url"] = article.top_image
-        
+
     # check for date
     is_date = "pdate" in article.meta_data
-    
+
     if "date" not in news and is_date:
         news["date"] = datetime.strptime(str(article.meta_data["pdate"]), "%Y%m%d")
-    
+
     if "datetime" not in news and is_date:
         news["datetime"] = datetime.strptime(str(article.meta_data["pdate"]), "%Y%m%d")
-        
+
     # check for title
     if "title" not in news:
         news["title"] = article.title
-        
+
     return news
 
 
 if __name__ == "__main__":
     # Example usage:
-    news_article = {
-        "link": "https://example.com/news-article-url"
-    }
+    news_article = {"link": "https://example.com/news-article-url"}
 
     result = get_full_news(news_article)
 

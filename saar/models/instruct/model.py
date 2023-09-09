@@ -59,11 +59,11 @@ Note:
 """
 
 
+import os, json
 from peft import PeftModel
 import torch
 
-from transformers import (AutoModelForSeq2SeqLM, 
-                          AutoTokenizer)
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 
 class PeftModelUtils:
@@ -71,10 +71,10 @@ class PeftModelUtils:
     def load_base_model(model_path="google/flan-t5-base"):
         """
         Loads a base transformer model for sequence-to-sequence tasks from the specified model path.
-        
+
         Parameters:
             model_path (str): The path or identifier of the base transformer model to load.
-        
+
         Returns:
             model (PreTrainedModel): The loaded transformer model.
             tokenizer (PreTrainedTokenizer): The associated tokenizer for the model.
@@ -87,7 +87,10 @@ class PeftModelUtils:
 
     @staticmethod
     def load_from_peft_adapter(
-        base_model_path: str, peft_model_path: str, train: bool=False, merge_adapter: bool=False
+        peft_model_path: str,
+        base_model_path: str = None,
+        train: bool = False,
+        merge_adapter: bool = False,
     ):
         """
         Loads a model from a 'peft' adapter, optionally making it trainable and merging it with the base model.
@@ -102,13 +105,18 @@ class PeftModelUtils:
             model (PeftModel): The loaded 'peft' model, optionally merged with the base model.
             tokenizer (PreTrainedTokenizer): The associated tokenizer for the model.
         """
+        if base_model_path is None:
+            base_model_path = PeftModelUtils.get_base_model_path_of_peft_adapter(
+                adapter_path=peft_model_path
+            )
+
         model, tokenizer = PeftModelUtils.load_base_model(base_model_path)
         model = PeftModel.from_pretrained(
-            model, 
-            peft_model_path, 
-            torch_dtype=torch.bfloat16, 
+            model,
+            peft_model_path,
+            torch_dtype=torch.bfloat16,
             is_trainable=train,
-            device_map="auto"
+            device_map="auto",
         )
 
         # merge the adapter to the main model
@@ -118,7 +126,7 @@ class PeftModelUtils:
             if train:
                 for param in model.parameters():
                     param.requires_grad = True
-                    
+
         return model, tokenizer
 
     @staticmethod
@@ -129,7 +137,16 @@ class PeftModelUtils:
     def merge_peft_and_save(model, model_path):
         model = model.merge_and_unload()
         model.save_pretrained(model_path)
-        
+
     @staticmethod
     def save_tokenizer(tokenizer, model_path):
         tokenizer.save_pretrained(model_path)
+
+    @staticmethod
+    def get_base_model_path_of_peft_adapter(adapter_path):
+        config_path = os.path.join(adapter_path, "adapter_config.json")
+
+        with open(config_path, "r") as file:
+            config = json.load(file)
+
+        return config["base_model_name_or_path"]

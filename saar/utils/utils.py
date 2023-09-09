@@ -2,7 +2,9 @@ from typing import List, Dict
 import re
 
 
-def deduplicate_list_of_dicts(input_list: List[Dict], keys_to_check: List[str]) -> List[Dict]:
+def deduplicate_list_of_dicts(
+    input_list: List[Dict], keys_to_check: List[str]
+) -> List[Dict]:
     """
     Remove duplicates from a list of dictionaries based on specified keys.
 
@@ -43,21 +45,21 @@ def deduplicate_list_of_dicts(input_list: List[Dict], keys_to_check: List[str]) 
     """
     seen = set()
     deduplicated_list = []
-    
+
     for d in input_list:
         dict_subset = {key: d[key] for key in keys_to_check if key in d}
         dict_tuple = tuple(dict_subset.items())
-        
+
         if dict_tuple not in seen:
             seen.add(dict_tuple)
             deduplicated_list.append(d)
-    
+
     return deduplicated_list
 
 
 def clean_model_generated_text(text):
     """
-    This function takes model-generated text as input and performs text cleaning operations to improve readability and remove redundancy. 
+    This function takes model-generated text as input and performs text cleaning operations to improve readability and remove redundancy.
     It performs the following tasks:
 
     1. Removes extra whitespace and newline characters:
@@ -83,17 +85,17 @@ def clean_model_generated_text(text):
     """
 
     # Remove extra whitespace and newline characters
-    text = ' '.join(text.split())
+    text = " ".join(text.split())
 
     # Remove repeated sentences
-    sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s', text)
-    
+    sentences = re.split(r"(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s", text)
+
     unique_sentences = []
     for sentence in sentences:
         if sentence not in unique_sentences:
             unique_sentences.append(sentence)
-            
-    cleaned_text = ' '.join(unique_sentences)
+
+    cleaned_text = " ".join(unique_sentences)
     return cleaned_text
 
 
@@ -105,7 +107,7 @@ def print_number_of_trainable_model_parameters(model):
     model (torch.nn.Module): The PyTorch model for which you want to count trainable parameters.
 
     Returns:
-    str: A string containing information about the trainable and total parameters, 
+    str: A string containing information about the trainable and total parameters,
          as well as the percentage of trainable parameters.
 
     Example:
@@ -116,14 +118,14 @@ def print_number_of_trainable_model_parameters(model):
     all model parameters: 789012
     percentage of trainable model parameters: 15.65%
     """
-        
+
     trainable_model_params = 0
     all_model_params = 0
-    
+
     for _, param in model.named_parameters():
         all_model_params += param.numel()
-        
+
         if param.requires_grad:
             trainable_model_params += param.numel()
-    
+
     return f"trainable model parameters: {trainable_model_params}\nall model parameters: {all_model_params}\npercentage of trainable model parameters: {100 * trainable_model_params / all_model_params:.2f}%"

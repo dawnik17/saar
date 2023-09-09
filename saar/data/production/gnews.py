@@ -30,61 +30,59 @@ For more information about the 'GoogleNews' library and its parameters, refer to
 """
 
 
-
 from tqdm import tqdm
 from GoogleNews import GoogleNews
 from typing import List, Dict
 
 
-topics = ['Top Stories',
-          'World',
-          'Nation',
-          'Business',
-          'Technology',
-          'Entertainment',
-          'Sports',
-          'Science',
-          'Health',
-          'Politics']
+topics = [
+    "Top Stories",
+    "World",
+    "Nation",
+    "Business",
+    "Technology",
+    "Entertainment",
+    "Sports",
+    "Science",
+    "Health",
+    "Politics",
+]
 
 
-def get_google_news(use_method: str="search", 
-                    disable_tqdm: bool=False, 
-                    period: str="2d") -> List[Dict]:
-    
-    googlenews = GoogleNews(lang='en', 
-                            period=period,
-                            encode='utf-8')
-    
+def get_google_news(
+    use_method: str = "search", disable_tqdm: bool = False, period: str = "2d"
+) -> List[Dict]:
+    googlenews = GoogleNews(lang="en", period=period, encode="utf-8")
+
     results = []
 
     for topic in tqdm(topics, disable=disable_tqdm):
         if use_method == "search":
             # search news on "topic"
             googlenews.search(topic)
-            
+
             # fetch all pages from google search
             for i in range(2, 10):
                 googlenews.get_page(i)
-            
+
         else:
             # directly call the news API
             googlenews.get_news(topic)
 
         # get results
         result = googlenews.results()
-        
+
         for news in result:
             news["link"] = news["link"].split("&ved")[0]
             news["category"] = topic
-            
+
             del news["img"]
             del news["desc"]
-        
+
         results.extend(result)
         googlenews.clear()
 
-    results = sorted(results, reverse=True, key=lambda d: d['datetime'])
+    results = sorted(results, reverse=True, key=lambda d: d["datetime"])
     return results
 
 
