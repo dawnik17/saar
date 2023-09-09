@@ -687,7 +687,6 @@ rss_feeds = [
     "https://www.engadget.com/rss.xml",
     "https://kotaku.com/rss",
     "https://www.cnet.com/rss/news/",
-
     # News and Current Affairs
     "https://www.bbc.co.uk/news/rss.xml",
     "https://www.cbsnews.com/latest/rss/main",
@@ -701,13 +700,11 @@ rss_feeds = [
     "https://www.npr.org/rss/rss.php?id=1001",
     "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
     "https://feeds.bbci.co.uk/news/technology/rss.xml",
-
     # Sports
     "https://www.espn.com/espn/rss/news",
     "https://www.sportingnews.com/us/rss",
     "https://www.bbc.co.uk/sport/0/rss.xml",
     "https://www.sportsnet.ca/feed/",
-
     # Entertainment
     "https://www.eonline.com/de/rss/news",
     "https://www.etonline.com/rss",
@@ -715,14 +712,12 @@ rss_feeds = [
     "https://www.hollywoodreporter.com/taxonomy/term/6/feed",
     "https://www.vulture.com/rss/all.xml",
     "https://www.buzzfeed.com/entertainment.xml",
-
     # Business and Finance
     "https://www.businessinsider.com/sai/rss",
     "https://www.cnbc.com/id/100003114/device/rss/rss.html",
     "https://www.wsj.com/xml/rss/3_7014.xml",
     "https://www.forbes.com/investing/feed2/",
     "https://www.fool.com/feeds/index.aspx",
-
     # Health and Wellness
     "https://www.webmd.com/rss/breaking-news.xml",
     "https://www.everydayhealth.com/feed-items.rss",
@@ -730,13 +725,11 @@ rss_feeds = [
     "https://www.healthline.com/rss/news",
     "https://www.mayoclinic.org/rss/news",
     "https://rss.nytimes.com/services/xml/rss/nyt/Health.xml",
-
     # Gaming
     "https://www.polygon.com/rss/index.xml",
     "https://www.gamasutra.com/rss.xml",
     "https://www.gamespot.com/feeds/mashup/",
     "https://www.ign.com/rss.xml",
-
     # Food and Cooking
     "https://www.foodnetwork.com/rss/newsletter.rss",
     "https://www.allrecipes.com/feed/",
