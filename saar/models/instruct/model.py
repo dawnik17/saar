@@ -87,7 +87,7 @@ class PeftModelUtils:
 
     @staticmethod
     def load_from_peft_adapter(
-        peft_model_path: str,
+        adapter_path: str,
         base_model_path: str = None,
         train: bool = False,
         merge_adapter: bool = False,
@@ -107,13 +107,13 @@ class PeftModelUtils:
         """
         if base_model_path is None:
             base_model_path = PeftModelUtils.get_base_model_path_of_peft_adapter(
-                adapter_path=peft_model_path
+                adapter_path=adapter_path
             )
 
         model, tokenizer = PeftModelUtils.load_base_model(base_model_path)
         model = PeftModel.from_pretrained(
             model,
-            peft_model_path,
+            adapter_path,
             torch_dtype=torch.bfloat16,
             is_trainable=train,
             device_map="auto",

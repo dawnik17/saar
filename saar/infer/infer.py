@@ -131,7 +131,7 @@ class Infer:
 
         # title generation config
         self.title_generation_config = GenerationConfig(
-            max_new_tokens=50,
+            max_new_tokens=25,
             num_beams=8,
             do_sample=False,
             temperature=1.5,
