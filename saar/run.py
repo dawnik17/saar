@@ -4,6 +4,11 @@ from tqdm import tqdm
 from saar.data.production import get_google_news
 from saar.infer import Infer
 from saar.utils import deduplicate_list_of_dicts, get_full_news
+from dotenv import load_dotenv
+from datetime import date
+
+
+load_dotenv()
 
 # fetch news
 news = get_google_news(use_method="search")
@@ -13,11 +18,11 @@ news += get_google_news(use_method="get_news")
 news = deduplicate_list_of_dicts(news, keys_to_check=["link"])
 
 """
-this is a way to getthe urls already processed
+this is a way to get the urls already processed
 just to take out the delta
 and process the new urls only
 """
-title_store_path = ""
+title_store_path = os.environ["TITLE_STORE_PATH"]
 title_store = (
     pickle.load(open(title_store_path, "rb"))
     if os.path.isfile(title_store_path)
@@ -42,8 +47,9 @@ run inference
 """
 if len(news) > 0:
     # summary adapter, title adapter path
-    summary_adapter_path = "./checkpoint/summary/"
-    title_adapter_path = "./checkpoint/title/"
+
+    summary_adapter_path = os.environ["SUMMARY_ADAPTER_PATH"]
+    title_adapter_path = os.environ["TITLE_ADAPTER_PATH"]
 
     infer = Infer(
         summary_adapter_path=summary_adapter_path, title_adapter_path=title_adapter_path
@@ -57,5 +63,21 @@ if len(news) > 0:
     news = infer(mode="title", data=news)
 
 """
-save the delta news
+save the delta news as files
 """
+# save delta news seperately
+delta_news_path = os.environ["DELTA_NEWS_PATH"]
+pickle.dump(news, open(delta_news_path, "wb")) 
+
+# append the delta news in today's news to make the data whole
+date_wise_news_path = os.environ["DATE_WISE_NEWS_PATH"]
+date_wise_news_path = os.path.join(date_wise_news_path, str(date.today()))
+
+if os.path.exists(date_wise_news_path):
+    with open(date_wise_news_path, "rb") as file:
+        data = pickle.load(file)
+else:
+    data = []
+
+data.extend(news)
+pickle.dump(data, open(date_wise_news_path, "wb")) 

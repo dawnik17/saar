@@ -3,3 +3,6 @@ GoogleNews==1.6.10
 newspaper3k==0.2.8
 transformers==4.28.1
 peft==0.3.0
+python-dotenv==1.0.0
+elasticsearch==8.7.0
+flask==2.3.3
