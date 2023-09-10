@@ -10,7 +10,7 @@ from datetime import date
 
 
 load_dotenv()
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"  
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 logging.basicConfig(
     level=logging.DEBUG, format="[%(asctime)s]  [%(levelname)s]  %(message)s"
@@ -18,8 +18,8 @@ logging.basicConfig(
 
 # fetch news
 logging.info("fetching news..")
-news = get_google_news(use_method="search")
-news += get_google_news(use_method="get_news")
+# news = get_google_news(use_method="search")
+news = get_google_news(use_method="get_news")
 
 # deduplicate news
 news = deduplicate_list_of_dicts(news, keys_to_check=["link"])
@@ -62,21 +62,31 @@ if len(news) > 0:
         summary_adapter_path=summary_adapter_path, title_adapter_path=title_adapter_path
     )
 
-    # generate summary
-    logging.info("running summary..")
-    news = infer(mode="summary", data=news)
+    # batching
+    batch = lambda data, batch_size: [data[i:i + batch_size] for i in range(0, len(data), batch_size)]
+    
+    batch_size = os.environ["BATCH_SIZE"]
+    news = batch(news, batch_size=batch_size)
+    
+    data = []
+    
+    logging.info("running inference..")
+    for news_batch in tqdm(news):
+        # generate summary
+        news_batch = infer(mode="summary", data=news_batch)
 
-    # generate title
-    # NOTE: Title generation needs summary already generated as "generated_summary" key in the news dict
-    logging.info("running title..")
-    news = infer(mode="title", data=news)
+        # generate title
+        # NOTE: Title generation needs summary already generated as "generated_summary" key in the news dict
+        news_batch = infer(mode="title", data=news_batch)
+        
+        data.extend(news_batch)
 
 """
 save the delta news as files
 """
 # save delta news seperately
 delta_news_path = os.environ["DELTA_NEWS_PATH"]
-pickle.dump(news, open(delta_news_path, "wb"))
+pickle.dump(data, open(delta_news_path, "wb"))
 
 # append the delta news in today's news to make the data whole
 date_wise_news_path = os.environ["DATE_WISE_NEWS_PATH"]
@@ -84,9 +94,9 @@ date_wise_news_path = os.path.join(date_wise_news_path, f"{date.today()}.pkl")
 
 if os.path.exists(date_wise_news_path):
     with open(date_wise_news_path, "rb") as file:
-        data = pickle.load(file)
+        news = pickle.load(file)
 else:
-    data = []
+    news = []
 
-data.extend(news)
-pickle.dump(data, open(date_wise_news_path, "wb"))
+news.extend(data)
+pickle.dump(news, open(date_wise_news_path, "wb"))
