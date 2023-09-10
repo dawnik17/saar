@@ -54,7 +54,6 @@ run inference
 """
 if len(news) > 0:
     # summary adapter, title adapter path
-
     summary_adapter_path = os.environ["SUMMARY_ADAPTER_PATH"]
     title_adapter_path = os.environ["TITLE_ADAPTER_PATH"]
 
