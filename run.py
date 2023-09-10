@@ -1,5 +1,6 @@
 import os
 import pickle
+import logging
 from tqdm import tqdm
 from saar.data.production import get_google_news
 from saar.infer import Infer
@@ -11,7 +12,12 @@ from datetime import date
 load_dotenv()
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"  
 
+logging.basicConfig(
+    level=logging.DEBUG, format="[%(asctime)s]  [%(levelname)s]  %(message)s"
+)
+
 # fetch news
+logging.info("fetching news..")
 news = get_google_news(use_method="search")
 news += get_google_news(use_method="get_news")
 
@@ -52,15 +58,18 @@ if len(news) > 0:
     summary_adapter_path = os.environ["SUMMARY_ADAPTER_PATH"]
     title_adapter_path = os.environ["TITLE_ADAPTER_PATH"]
 
+    logging.info("loading models..")
     infer = Infer(
         summary_adapter_path=summary_adapter_path, title_adapter_path=title_adapter_path
     )
 
     # generate summary
+    logging.info("running summary..")
     news = infer(mode="summary", data=news)
 
     # generate title
     # NOTE: Title generation needs summary already generated as "generated_summary" key in the news dict
+    logging.info("running title..")
     news = infer(mode="title", data=news)
 
 """
