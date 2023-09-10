@@ -72,6 +72,9 @@ def curate_article(article):
 
 
 def get_full_news(news: Dict):
+    if "https://" not in news["link"]:
+        news["link"] = f"https://{news['link']}"
+
     url = news["link"]
 
     try:
