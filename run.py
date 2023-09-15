@@ -65,7 +65,7 @@ if len(news) > 0:
     # batching
     batch = lambda data, batch_size: [data[i:i + batch_size] for i in range(0, len(data), batch_size)]
     
-    batch_size = os.environ["BATCH_SIZE"]
+    batch_size = int(os.environ["BATCH_SIZE"])
     news = batch(news, batch_size=batch_size)
     
     data = []
